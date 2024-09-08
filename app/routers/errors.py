@@ -9,4 +9,4 @@ def handle_error(e):
     if hasattr(e, 'code'):
         status_code = e.code
 
-    return jsonify({'message': str(e)}), status_code
+    return jsonify({'message': str(e), 'code': status_code}), status_code

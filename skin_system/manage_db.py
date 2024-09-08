@@ -1,6 +1,6 @@
 import sqlite3
 from .get_path import *
-from flask import jsonify, redirect
+from flask import jsonify
 
 
 def connect_to_db():
@@ -39,7 +39,7 @@ def nickname_exists(nickname=None, redirect_nickname=None):
                               WHERE nickname = ? OR redirect = ?;''',
                            (redirect_nickname, redirect_nickname))
         else:
-            return jsonify({"message": "nickname and redirected nickname are empty"}), 403
+            return jsonify({"message": "nickname and redirected nickname are empty", "code": 400}), 400
 
         return cursor.fetchone() is not None
 
@@ -57,7 +57,7 @@ def what_redirect_of(username):
 
 def add_nickname(nickname, redirect_nickname):
     if nickname_exists(nickname, redirect_nickname):
-        return jsonify({"message": "nickname or redirected nickname already exists"}), 403
+        return jsonify({"message": "nickname or redirected nickname already exists", "code": 409}), 409
 
     data = nickname, redirect_nickname
     with connect_to_db() as connection:
@@ -68,19 +68,19 @@ def add_nickname(nickname, redirect_nickname):
         """, data)
         connection.commit()
 
-    return jsonify({"message": "data added successfully"}), 201
+    return jsonify({"message": "data added successfully", "code": 200}), 200
 
 
 def remove_nickname(nickname):
     if not nickname_exists(nickname):
-        return {"message": "no nickname to delete"}, 403
+        return {"message": "no nickname to delete", "code": 404}, 404
 
     with connect_to_db() as connection:
         cursor = connection.cursor()
         cursor.execute(""" DELETE FROM redirected_nicknames WHERE nickname = ?""", (nickname,))
         connection.commit()
 
-    return {"message": "data deleted successfully"}, 201
+    return {"message": "data deleted successfully", "code": 200}, 200
 
 
 def search_on_db(nickname):
@@ -97,6 +97,6 @@ def search_on_db(nickname):
         data = [dict(zip(column_names, row)) for row in rows]
 
         if not data:
-            return jsonify({"message": "no nickname found"}), 404
+            return jsonify({"message": "no nickname found", "code": 404}), 404
 
-        return jsonify(data), 201
+        return jsonify(data), 200

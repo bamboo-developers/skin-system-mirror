@@ -1,6 +1,5 @@
 from flask import Flask
 from werkzeug.exceptions import HTTPException
-
 import skin_system
 from skin_system.manage_db import create_db
 from .extensions import limiter

@@ -16,7 +16,7 @@ def func(username):
     skin_image = skin_system.resolv_skin(url)
 
     if skin_image is None:
-         return jsonify({'message': f'skin not found'})
+         return jsonify({'message': f'skin not found', 'code': 404}), 404
 
     scale = min(request.args.get('scale', default=8, type=int,), 100)
     type = request.args.get('type', default='body', type=str)

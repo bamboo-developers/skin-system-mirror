@@ -17,14 +17,14 @@ def func(username):
     skin_image = skin_system.resolv_skin(url)
 
     if skin_image is None:
-         return jsonify({'message': f'skin not found'})
+         return jsonify({'message': f'skin not found', 'code': 404}), 404
 
     scale = min(request.args.get('scale', default=8, type=int), 100)
     y = request.args.get('y', default='front', type=str)
     z = request.args.get('z', default='up', type=str)
 
     if y not in y_allowed or z not in z_allowed:
-            return jsonify({"message": "Invalid parameters"})
+            return jsonify({"message": "Invalid parameters", "code": 400}), 400
 
     processed_skin = skin_system.perspective(skin_image, scale, y, z)
 

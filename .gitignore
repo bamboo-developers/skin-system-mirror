@@ -2,6 +2,7 @@
 .idea/
 .venv/
 *.iml/
+__pycache__/
 .gitignore
 out
 gen

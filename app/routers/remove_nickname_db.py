@@ -8,6 +8,6 @@ bp = Blueprint('delete_nickname_db', __name__)
 def func(username):
     for nick in [username]:
         if not skin_system.valid_minecraft_nick(nick):
-            return jsonify({'message': f'invalid nickname: {nick}'}), 403
+            return jsonify({'message': f'invalid nickname: {nick}', 'code': 422}), 422
 
     return skin_system.remove_nickname(username)

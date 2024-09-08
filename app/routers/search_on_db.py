@@ -9,7 +9,7 @@ def func(username):
     if username != "<all>":
         for nick in [username]:
             if not skin_system.valid_minecraft_nick(nick):
-                return jsonify({'message': f'invalid nickname: {nick}'}), 403
+                return jsonify({'message': f'invalid nickname: {nick}', 'code': 422}), 422
     else: pass
 
     return skin_system.search_on_db(username)

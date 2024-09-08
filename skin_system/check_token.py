@@ -29,11 +29,11 @@ def token_required(min_priority):
             valid_tokens = load_tokens()
 
             if not token or token not in valid_tokens:
-                return {'message': 'Invalid token or token not found'}, 403
+                return {'message': 'Invalid token or token not found', 'code': 401}, 401
 
             token_priority = valid_tokens[token].get('priority', 0)
             if token_priority < min_priority:
-                return {'message': 'Insufficient token priority'}, 403
+                return {'message': 'Insufficient token priority', 'code': 403}, 403
 
             return func(*args, **kwargs)
         return decorated_function
