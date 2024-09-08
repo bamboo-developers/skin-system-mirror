@@ -3,9 +3,9 @@
 .venv/
 *.iml/
 __pycache__/
-.gitignore
 out
 gen
 
 skin-system.db
 tokens.json
+.gitignore
