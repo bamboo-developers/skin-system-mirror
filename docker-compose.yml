@@ -1,0 +1,16 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: skin-system
+    volumes:
+      - .:/skin-system
+      - ./nginx/logs:/var/log/nginx
+      - ./gunicorn/logs:/app/logs
+    ports:
+      - "5050:5050"
+      - "5000:5000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: always
