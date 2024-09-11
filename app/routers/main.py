@@ -16,7 +16,7 @@ def get_uptime():
 
 @bp.route('/')
 def index():
-    real_ip = request.headers.get('X-Forwarded-For') or request.remote_addr
+    real_ip = request.headers.get('X-Forwarded-For')
 
     return jsonify({
         'message': 'skin-system online and ready to work',
