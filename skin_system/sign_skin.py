@@ -1,25 +1,30 @@
 import requests
 import json
+from temp_skin_storge import *
 from flask import jsonify
 import os
 
-def sign_skin(name):
-    url = 'https://api.mineskin.org/generate/url'
+
+def sign_skin(name, path):
+    url = 'https://api.mineskin.org/generate/upload'
 
     headers = {
         'accept': 'application/json',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.142.86 Safari/537.36',
-        'Authorization': f'{os.environ.get("SIGN_API_TOKEN")}',
-        'Content-Type': 'application/json'
+        'Authorization': f'{os.environ.get("SIGN_API_TOKEN")}'
     }
 
     data = {
-        'url': 'https://skin-api.bambooland.fun/skin/yiski?token=token1',
-        'visibility': 1,
-        'name': f'{name}'
+        'name': name,
+        'visibility': 1
     }
 
-    response = requests.post(url, headers=headers, json=data)
+    with open(path, 'rb') as file:
+        files = {
+            'file': (path, file, 'image/png')
+        }
+
+        response = requests.post(url, headers=headers, data=data, files=files)
 
     if response.status_code == 200:
         response_json = response.json()
@@ -35,7 +40,8 @@ def sign_skin(name):
         return json.dumps(result, indent=4)
 
     else:
-        return jsonify({"message": "failed",
-                        "code": response.status_code,
-                        "response text": response.text
-                        }), response.status_code
+        return {
+            "message": "failed",
+            "code": response.status_code,
+            "response text": response.text
+        }, response.status_code

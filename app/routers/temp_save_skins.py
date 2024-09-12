@@ -1,6 +1,12 @@
 from flask import Blueprint, request, send_from_directory, jsonify
 import skin_system
 
+'''
+curl -X POST http://127.0.0.1:5000/temp \
+  -F 'file=@/path/to/your/skin.png' \
+  -F 'time=60'
+'''
+
 bp = Blueprint('temp_save_skins', __name__)
 
 UPLOAD_FOLDER = skin_system.get_path('temp/', "..")

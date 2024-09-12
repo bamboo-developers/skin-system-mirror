@@ -1,18 +1,15 @@
+import uuid
 from flask import request, jsonify
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
-import uuid
-from .convert import *
-from .get_path import *
 import subprocess
-from PIL import Image
+from .get_path import *
+from .convert import *
 
-
-UPLOAD_FOLDER = get_path('temp/', "..")
+UPLOAD_FOLDER = get_path('temp/', "..")  # Укажите путь к папке
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 DEFAULT_STORAGE_TIME = 120
-
 
 def temp_skin_storge(file, web=True, time=120):
     if not file:

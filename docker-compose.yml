@@ -13,4 +13,5 @@ services:
       - "5000:5000"
     environment:
       - PYTHONUNBUFFERED=1
+      - SIGN_API_TOKEN=TO_CREATE_TOKEN_->_https://mineskin.org/apikey
     restart: always
