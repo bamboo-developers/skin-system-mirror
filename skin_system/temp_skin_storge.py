@@ -6,7 +6,7 @@ import subprocess
 from .get_path import *
 from .convert import *
 
-UPLOAD_FOLDER = get_path('temp/', "..")  # Укажите путь к папке
+UPLOAD_FOLDER = get_path('temp/', "..")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 DEFAULT_STORAGE_TIME = 120
