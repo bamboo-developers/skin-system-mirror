@@ -7,3 +7,4 @@ from .resolv_skin import *
 from .skin_render import *
 from .manage_db import *
 from .valid_minecraft_nick import *
+from .temp_skin_storge import *

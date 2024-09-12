@@ -14,7 +14,7 @@ def get_uptime():
     return uptime
 
 
-@bp.route('/')
+@bp.route('/debug')
 def index():
     x_forwarded_for = request.headers.get('X-Forwarded-For', '')
     real_ip = x_forwarded_for.split(',')[0].strip()

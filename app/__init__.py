@@ -4,7 +4,7 @@ import skin_system
 from skin_system.manage_db import create_db
 from .extensions import limiter
 from .routers import (skin, render, perspective_render, errors, textures, profile, signature_ver_key, signed_textures,
-                      add_nickname_db, remove_nickname_db, search_on_db, main)
+                      add_nickname_db, remove_nickname_db, search_on_db, debug, temp_save_skins)
 
 
 def create_app():
@@ -14,7 +14,7 @@ def create_app():
 
     app.register_error_handler(HTTPException, errors.handle_error)
 
-    app.register_blueprint(main.bp)
+    app.register_blueprint(debug.bp)
     app.register_blueprint(skin.bp)
     app.register_blueprint(render.bp)
     app.register_blueprint(perspective_render.bp)
@@ -25,6 +25,7 @@ def create_app():
     app.register_blueprint(add_nickname_db.bp)
     app.register_blueprint(remove_nickname_db.bp)
     app.register_blueprint(search_on_db.bp)
+    app.register_blueprint(temp_save_skins.bp)
 
     create_db()
     skin_system.load_tokens()
