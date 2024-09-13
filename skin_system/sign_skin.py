@@ -1,7 +1,5 @@
 import requests
 import json
-from temp_skin_storge import *
-from flask import jsonify
 import os
 
 
