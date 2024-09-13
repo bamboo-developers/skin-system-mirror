@@ -1,11 +1,10 @@
 import requests
 import json
-from temp_skin_storge import *
 from flask import jsonify
 import os
 
 
-def sign_skin(name, path):
+def sign_skin(path):
     url = 'https://api.mineskin.org/generate/upload'
 
     headers = {
@@ -15,7 +14,7 @@ def sign_skin(name, path):
     }
 
     data = {
-        'name': name,
+        # 'name': name,
         'visibility': 1
     }
 
@@ -30,14 +29,14 @@ def sign_skin(name, path):
         response_json = response.json()
 
         result = {
-            'name': response_json.get('name', ''),
+            # 'name': response_json.get('name', ''),
             'value': response_json.get('data', {}).get('texture', {}).get('value', ''),
             'signature': response_json.get('data', {}).get('texture', {}).get('signature', ''),
-            'timestamp': response_json.get('timestamp', ''),
-            'skin_url': response_json.get('data', {}).get('texture', {}).get('url', '')
+            # 'timestamp': response_json.get('timestamp', ''),
+            # 'skin_url': response_json.get('data', {}).get('texture', {}).get('url', '')
         }
 
-        return json.dumps(result, indent=4)
+        return result
 
     else:
         return {
