@@ -31,7 +31,7 @@ def upload_skin():
     file.save(file_path)
 
     try:
-        skin_id = skin_system.DB.write_sign_skin(file_path)
+        skin_id = skin_system.DB.get_sign_skin(file_path)
         skin_system.DB.toggle_redirect(nickname, redirect_ely)
         result = skin_system.DB.set_skin_id(nickname, skin_id)
 

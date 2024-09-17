@@ -37,7 +37,7 @@ def create_db():
                 """)
         connection.commit()
 
-class ManageDB(object):
+class ManageDB():
     def __init__(self):
         pass
 
@@ -73,7 +73,7 @@ class ManageDB(object):
             return need_redirect[0]
 
 
-    def write_sign_skin(self, skin_image):
+    def get_sign_skin(self, skin_image):
         base64_skin = skin_system.encode(skin_image)
 
         with connect_to_db() as connection:
@@ -114,7 +114,7 @@ class ManageDB(object):
 
             return cursor.fetchone()
 
-    def set_nickname_ely(self, nickname, redirect_nickname):
+    def set_redirected_nickname_ely(self, nickname, redirect_nickname):
         if not self.nickname_exists_ely(nickname, redirect_nickname):
             self.create_user(nickname)
 
@@ -141,7 +141,7 @@ class ManageDB(object):
 
         return True
 
-    def search_on_db(self, table_name: Literal["user_data", "skin_data"], nickname=None, user_id=None, skin_id=None):
+    def view_on_db(self, table_name: Literal["user_data", "skin_data"], nickname=None, user_id=None, skin_id=None):
         with connect_to_db() as connection:
             connection.row_factory = sqlite3.Row
             cursor = connection.cursor()
@@ -218,9 +218,29 @@ class ManageDB(object):
 
         return True
 
-    def return_data_for_system(self, **kwargs):
+    def proxy_from_ely(self, **kwargs):
+        if 'url' not in kwargs:
+            raise ValueError("You must provide 'url'")
+
+        url = kwargs['url']
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+            return data
+        else:
+            return {"message": f"Can't load skin data, {response.status_code}: {response.text}", "code": 500}
+
+    def return_texture_data_for_system(self, **kwargs):
+        skin_data =None
+
         if 'nickname' not in kwargs and 'user_id' not in kwargs:
             raise ValueError("You must provide either 'nickname' or 'user_id'")
+
+        if 'proxy' not in kwargs:
+            proxy = False
+        else:
+            proxy = kwargs['proxy']
 
         if 'nickname' in kwargs and 'user_id' in kwargs:
             raise ValueError("You can provide either 'nickname' or 'user_id', not both")
@@ -237,19 +257,15 @@ class ManageDB(object):
             cursor.execute(user_data, (kwargs[value],))
             user_data = cursor.fetchall()[0]
 
-            if not user_data[2]:
-                response = requests.get(f'http://skinsystem.ely.by/textures/signed/{user_data[1]}?proxy=true')
-
-                if response.status_code == 200:
-                    data = response.json()
-                    return data
+            if  user_data[2]:
+                skin_data = '''SELECT value, signature FROM skin_data WHERE id = ?'''
+                cursor.execute(skin_data, (user_data[2],))
+                skin_data = cursor.fetchall()[0]
+            else:
+                if proxy:
+                    return self.proxy_from_ely(url=f'http://skinsystem.ely.by/textures/signed/{user_data[1]}?proxy=true')
                 else:
-                    return {"message": f"Can't load skin data, {response.status_code}: {response.text}", "code": 500}
-
-            skin_data = '''SELECT value, signature FROM skin_data WHERE id = ?'''
-            cursor.execute(skin_data, (user_data[2],))
-            skin_data = cursor.fetchall()[0]
-
+                    skin_data = ["None record on database", ""]
 
             data = {
                 "id": user_data[0],

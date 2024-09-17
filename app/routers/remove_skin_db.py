@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify
 import skin_system
 
 bp = Blueprint('remove_skin_db', __name__)

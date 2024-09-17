@@ -17,8 +17,6 @@ def load_tokens():
   }
 }
 ''')
-        # raise FileNotFoundError(f"File not found: {tokens_path}")
-
     with open(tokens_path, 'r') as file:
         data = json.load(file)
     return data.get('valid_tokens', {})

@@ -18,6 +18,6 @@ def func(args):
                 return jsonify({'message': f'invalid nickname: {nick}', 'code': 422}), 422
 
     if db_type == 'skin_data':
-        return skin_system.DB.search_on_db('skin_data', skin_id=args)
+        return skin_system.DB.view_on_db('skin_data', skin_id=args)
 
-    return skin_system.DB.search_on_db('user_data', nickname=args, user_id=args)
+    return skin_system.DB.view_on_db('user_data', nickname=args, user_id=args)

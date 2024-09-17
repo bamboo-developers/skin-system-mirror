@@ -19,7 +19,7 @@ def func(username):
             if not skin_system.valid_minecraft_nick(nick):
                 return jsonify({'message': f'invalid nickname: {nick}', 'code': 422}), 422
 
-    result = skin_system.DB.set_nickname_ely(username, redirect_nickname)
+    result = skin_system.DB.set_redirected_nickname_ely(username, redirect_nickname)
 
     if result:
         return jsonify({'message': 'success', 'code': 200}), 200
