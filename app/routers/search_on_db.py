@@ -3,7 +3,7 @@ import skin_system
 
 bp = Blueprint('search_on_db', __name__)
 
-@bp.route('/db/search/<args>')
+@bp.route('/sys/search/<args>')
 @skin_system.token_required(1)
 def func(args):
     db_type = request.args.get('table')

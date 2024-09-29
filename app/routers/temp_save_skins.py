@@ -4,6 +4,7 @@ import skin_system
 '''
 curl -X POST http://127.0.0.1:5000/temp \
   -F 'file=@/path/to/your/skin.png' \
+  -F 'token=token' \
   -F 'time=60'
 '''
 
@@ -13,9 +14,10 @@ UPLOAD_FOLDER = skin_system.get_path('temp/', "..")
 
 
 @bp.route('/temp', methods=['POST'])
+@skin_system.token_required(1, method='POST')
 def upload_skin():
     file = request.files.get('file')
-    time = min(int(request.form.get('time', 120)), 120)
+    time = min(int(request.form.get('time', 120)), 300)
     if not file:
         return jsonify({'message': 'No file provided', 'code': 400}), 400
     result = skin_system.temp_skin_storge(file, web=True, time=time)

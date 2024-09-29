@@ -24,6 +24,8 @@ def load_tokens():
 def token_required(min_priority, method: Literal["GET", "POST"] = 'GET'):
     def decorator(func):
         def decorated_function(*args, **kwargs):
+            if os.environ.get("TOKEN_SYSTEM") == '0':
+                return func(*args, **kwargs)
             if method != 'GET':
                 token = request.form.get('token')
             else:
