@@ -11,7 +11,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 DEFAULT_STORAGE_TIME = 120
 
-def temp_skin_storge(file, web=True, time=120):
+def     temp_skin_storge(file, web=True, time=120):
     if not file:
         return jsonify({'message': 'No file provided', 'code': 400}), 400
 

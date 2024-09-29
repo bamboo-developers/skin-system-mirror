@@ -2,6 +2,7 @@ import json
 import os
 from flask import request
 from .get_path import get_path
+from typing import Literal
 
 def load_tokens():
     tokens_path = get_path('tokens.json', '..')
@@ -16,16 +17,19 @@ def load_tokens():
   }
 }
 ''')
-        # raise FileNotFoundError(f"File not found: {tokens_path}")
-
     with open(tokens_path, 'r') as file:
         data = json.load(file)
     return data.get('valid_tokens', {})
 
-def token_required(min_priority):
+def token_required(min_priority, method: Literal["GET", "POST"] = 'GET'):
     def decorator(func):
         def decorated_function(*args, **kwargs):
-            token = request.args.get('token')
+            if os.environ.get("TOKEN_SYSTEM") == '0':
+                return func(*args, **kwargs)
+            if method != 'GET':
+                token = request.form.get('token')
+            else:
+                token = request.args.get('token')
             valid_tokens = load_tokens()
 
             if not token or token not in valid_tokens:

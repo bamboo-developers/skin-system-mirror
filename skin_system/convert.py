@@ -1,7 +1,7 @@
 from PIL import Image
 
 
-def convert_skin(old_skin):
+def convert_skin(old_skin): #TODO fix convert as soon as possible
 
     if old_skin.size != (64, 32):
         raise ValueError("Old skin must be 64x32 pixels")

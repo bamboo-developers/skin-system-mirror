@@ -1,6 +1,7 @@
 import time
 import datetime
 from flask import Blueprint, jsonify, request
+import os
 
 bp = Blueprint('main', __name__)
 
@@ -20,7 +21,7 @@ def index():
     real_ip = x_forwarded_for.split(',')[0].strip()
 
     return jsonify({
-        'message': 'skin-system online and ready to work',
+        'message': f'{os.environ.get("SKIN_SYSTEM_NAME")} online and ready to work :-)',
         'code': 200,
         'uptime': get_uptime(),
         "requester's IP": real_ip

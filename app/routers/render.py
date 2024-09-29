@@ -9,9 +9,9 @@ bp = Blueprint('render', __name__)
 @skin_system.token_required(0)
 @bp.errorhandler(HTTPException)
 def func(username):
-    username = skin_system.what_redirect_of(username)
+    username = skin_system.DB.what_redirect_of(username, 'ely')
 
-    url = f"http://skinsystem.ely.by/skins/{username}.png"
+    url = f"http://skinsystem.ely.by/skins/{username['ely']}.png"
 
     skin_image = skin_system.resolv_skin(url)
 
