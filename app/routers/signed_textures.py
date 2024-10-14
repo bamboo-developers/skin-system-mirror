@@ -9,7 +9,8 @@ def func(username):
     proxy = request.args.get('proxy', default='false', type=str)
     if proxy != 'true':
         proxy = False
-    else: proxy = True
+    else: 
+        proxy = True
 
     what_skin_system = skin_system.DB.what_redirect_of(username)
 

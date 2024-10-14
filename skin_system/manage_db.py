@@ -11,7 +11,7 @@ SKIN_DATA = 'skin_data'
 
 
 def connect_to_db():
-    project_root = get_path('skin-system.db', '..')
+    project_root = get_path('skin-system.db', '..')  # noqa: F405
     return sqlite3.connect(project_root)
 
 def create_db():
@@ -155,7 +155,7 @@ class ManageDB():
                     result = cursor.fetchall()
                     return [dict(row) for row in result]
 
-                cursor.execute(f'''SELECT * FROM user_data WHERE nickname = ? OR id = ?''', (nickname, user_id))
+                cursor.execute('''SELECT * FROM user_data WHERE nickname = ? OR id = ?''', (nickname, user_id))
                 result = cursor.fetchall()
 
             return [dict(row) for row in result]

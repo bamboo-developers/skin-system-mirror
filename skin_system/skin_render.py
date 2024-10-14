@@ -1,5 +1,5 @@
 from PIL import Image
-from .convert import *
+from skin_system import convert_skin
 
 
 def process(skin_image, scale_factor, body_type, need_layer):

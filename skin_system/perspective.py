@@ -1,5 +1,5 @@
 from skinpy import Skin, Perspective
-from .convert import *
+from skin_system import convert_skin
 
 
 def perspective(skin_image, scale_factor, y, z):

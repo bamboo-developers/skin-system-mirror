@@ -3,8 +3,9 @@ from flask import request, jsonify
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 import subprocess
-from .get_path import *
-from .convert import *
+from skin_system import get_path, convert_skin
+import os
+from PIL import Image
 
 UPLOAD_FOLDER = get_path('temp/', "..")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
