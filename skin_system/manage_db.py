@@ -73,7 +73,7 @@ class ManageDB():
             return need_redirect[0]
 
 
-    def get_sign_skin(self, skin_image):
+    def get_sign_skin(self, nickname, skin_image):
         base64_skin = skin_system.encode(skin_image)
 
         with connect_to_db() as connection:
@@ -84,14 +84,17 @@ class ManageDB():
                 result = cursor.fetchone()
                 return result[0]
 
-            result = skin_system.sign_skin(skin_image)
+            result = skin_system.sign_skin(nickname, skin_image)
             if 'value' not in result or 'signature' not in result:
                 return {"message": result, "code": 500}
+
+            value = result['value']
+            signature = result['signature']
 
             skin_id = skin_system.generate_id(12)
 
             cursor.execute('''INSERT INTO skin_data (id, skin, value, signature) VALUES (?, ?, ?, ?)''',
-                           (skin_id, base64_skin, result['value'], result['signature']))
+                           (skin_id, base64_skin, value, signature))
             connection.commit()
             return skin_id
 
@@ -149,14 +152,22 @@ class ManageDB():
             if nickname == "<all>":
                 cursor.execute(f'''SELECT * FROM {table_name}''')
                 result = cursor.fetchall()
-            else:
-                if skin_id:
-                    cursor.execute('''SELECT * FROM skin_data WHERE id = ?''', (skin_id,))
+
+                return [dict(row) for row in result]
+
+            if skin_id:
+                if skin_id == "<all>":
+                    cursor.execute(f'''SELECT * FROM skin_data''')
                     result = cursor.fetchall()
+
                     return [dict(row) for row in result]
 
-                cursor.execute('''SELECT * FROM user_data WHERE nickname = ? OR id = ?''', (nickname, user_id))
+                cursor.execute('''SELECT * FROM skin_data WHERE id = ?''', (skin_id,))
                 result = cursor.fetchall()
+                return [dict(row) for row in result]
+
+            cursor.execute('''SELECT * FROM user_data WHERE nickname = ? OR id = ?''', (nickname, user_id))
+            result = cursor.fetchall()
 
             return [dict(row) for row in result]
 

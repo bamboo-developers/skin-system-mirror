@@ -34,8 +34,8 @@ def sign_skin(name, path):
             'timestamp': response_json.get('timestamp', ''),
             'skin_url': response_json.get('data', {}).get('texture', {}).get('url', '')
         }
-
-        return json.dumps(result, indent=4)
+        print(result)
+        return result
 
     else:
         return {
