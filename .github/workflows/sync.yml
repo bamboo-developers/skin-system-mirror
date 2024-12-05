@@ -19,7 +19,7 @@ jobs:
           git config --global user.name "yiski"
           git clone https://${{ env.ORG_NAME }}:${{ secrets.PAT_MIRROR  }}@github.com/${{ env.ORG_NAME }}/skin-system-mirror.git
           cd skin-system-mirror
-          git remote add ${{ env.ORIGINAL_REPO_NAME }} https://${{ env.ORG_NAME }}:${{ secrets.PAT_MIRROR  }}@github.com/${{ env.ORG_NAME }}/skin-system-mirror.git
+          git remote add ${{ env.ORIGINAL_REPO_NAME }} https://${{ env.ORG_NAME }}:${{ secrets.PAT_MIRROR  }}@github.com/steepboy/${{ env.ORIGINAL_REPO_NAME }}.git
           git remote update
           git merge ${{ env.ORIGINAL_REPO_NAME }}/main
           git push origin main
