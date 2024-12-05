@@ -1,0 +1,29 @@
+name: Sync Repos
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source repository
+        uses: actions/checkout@v3
+
+      - name: Push to destination repository
+        run: |
+          git config --global user.email "nikbustrov@gmail.com"
+          git config --global user.name "yiski"
+          git clone https://${{ env.ORG_NAME }}:${{ secrets.PAT_MIRROR  }}@github.com/${{ env.ORG_NAME }}/skin-system-mirror.git
+          cd skin-system-mirror
+          git remote add ${{ env.ORIGINAL_REPO_NAME }} https://${{ env.ORG_NAME }}:${{ secrets.PAT_MIRROR  }}@github.com/${{ env.ORG_NAME }}/${{ env.ORIGINAL_REPO_NAME }}.git
+          git remote update
+          git merge ${{ env.ORIGINAL_REPO_NAME }}/main
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_MIRROR  }}
+          ORIGINAL_REPO_NAME: ${{ github.event.repository.name }}
+          ORG_NAME: bamboo-developers
