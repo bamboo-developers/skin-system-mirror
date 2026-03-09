@@ -1,19 +1,15 @@
-from flask import Blueprint
+from fastapi import APIRouter, Request
 import skin_system
 
-bp = Blueprint('signature_ver_keyDER', __name__)
-bp2 = Blueprint('signature_ver_keyPEM', __name__)
+router = APIRouter()
+router2 = router  # для совместимости с create_app
 
-@bp.route('/signature-verification-key.der')
+@router.get('/signature-verification-key.der')
 @skin_system.token_required(0)
-def func():
-    url = "http://skinsystem.ely.by/signature-verification-key.der"
+def func(request: Request):
+    return skin_system.resolve("http://skinsystem.ely.by/signature-verification-key.der")
 
-    return skin_system.resolve(url)
-
-@bp2.route('/signature-verification-key.pem')
+@router.get('/signature-verification-key.pem')
 @skin_system.token_required(0)
-def func2():
-    url = "http://skinsystem.ely.by/signature-verification-key.pem"
-
-    return skin_system.resolve(url)
+def func2(request: Request):
+    return skin_system.resolve("http://skinsystem.ely.by/signature-verification-key.pem")

@@ -1,5 +1,9 @@
+from io import BytesIO
+
 from PIL import Image
 from skin_system import convert_skin
+from wavy_totem_lib import TotemBuilder, Skin
+
 
 
 def process(skin_image, scale_factor, body_type, need_layer):
@@ -62,3 +66,10 @@ def process_minecraft_head(skin_image, scale_factor, need_layer):
         canvas.paste(head_layer, (0, 0), mask=head_layer)
 
     return canvas
+
+def process_totem(skin_image, round_head: bool):
+    img_io = BytesIO()
+    skin_image.save(img_io, 'PNG')
+    img_io.seek(0)
+    totem = TotemBuilder(Skin(img_io), round_head=round_head).build()
+    return totem.image

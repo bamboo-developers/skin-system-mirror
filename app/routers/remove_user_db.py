@@ -1,15 +1,14 @@
-from flask import Blueprint, jsonify
+from fastapi import APIRouter, Request
+from fastapi.responses import JSONResponse
 import skin_system
 
-bp = Blueprint('remove_user_db', __name__)
+router = APIRouter()
 
-@bp.route('/sys/remove/user/<username>')
+@router.get('/sys/remove/user/{username}')
 @skin_system.token_required(1, 'GET')
-def func(username):
+def func(username: str, request: Request):
     if not skin_system.DB.record_exists('user_data', 'nickname', username):
-        return jsonify({'message': 'nickname not found', 'code': 404}), 404
-
+        return JSONResponse({'message': 'nickname not found', 'code': 404}, status_code=404)
     if skin_system.DB.remove_row('user_data', nickname=username):
-        return jsonify({'message': 'success', 'code': 200}), 200
-
-    return jsonify({'message': 'something went wrong', 'code': 500}), 500
+        return JSONResponse({'message': 'success', 'code': 200}, status_code=200)
+    return JSONResponse({'message': 'something went wrong', 'code': 500}, status_code=500)

@@ -1,27 +1,25 @@
-from flask import Blueprint, request, jsonify
+from fastapi import APIRouter, Request, Depends
+from fastapi.responses import JSONResponse
 import skin_system
 
-bp = Blueprint('add_nickname_db', __name__)
+router = APIRouter()
 
-@bp.route('/ely/set/<username>')
+@router.get('/ely/set/{username}')
 @skin_system.token_required(1)
-def func(username):
-    redirect_nickname = request.args.get('redirect')
+def func(username: str, request: Request, redirect: str = None):
+    if not redirect:
+        return JSONResponse({'message': 'parameter "redirect" is required', 'code': 400}, status_code=400)
 
-    if not redirect_nickname:
-        return jsonify({'message': 'parameter "redirect" is required', 'code': 400}), 400
-
-    if redirect_nickname == '<del>':
+    if redirect == '<del>':
         if not skin_system.valid_minecraft_nick(username):
-            return jsonify({'message': f'invalid nickname: {username}', 'code': 422}), 422
+            return JSONResponse({'message': f'invalid nickname: {username}', 'code': 422}, status_code=422)
     else:
-        for nick in [username, redirect_nickname]:
+        for nick in [username, redirect]:
             if not skin_system.valid_minecraft_nick(nick):
-                return jsonify({'message': f'invalid nickname: {nick}', 'code': 422}), 422
+                return JSONResponse({'message': f'invalid nickname: {nick}', 'code': 422}, status_code=422)
 
-    result = skin_system.DB.set_redirected_nickname_ely(username, redirect_nickname)
-
+    result = skin_system.DB.set_redirected_nickname_ely(username, redirect)
     if result:
-        return jsonify({'message': 'success', 'code': 200}), 200
+        return JSONResponse({'message': 'success', 'code': 200}, status_code=200)
     else:
-        return jsonify({'message': 'redirect nickname already exists', 'code': 400}), 400
+        return JSONResponse({'message': 'redirect nickname already exists', 'code': 400}, status_code=400)

@@ -1,0 +1,16 @@
+[project]
+name = "skin-system"
+version = "0.1.0"
+description = "A backend API service allows you to make your own skin system for the server with the ability to redirect to the Mojang API or Ely.by "
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.135.1",
+    "pillow>=11.3.0",
+    "python-dotenv>=1.2.1",
+    "python-multipart>=0.0.22",
+    "requests>=2.32.5",
+    "skinpy>=0.0.4",
+    "slowapi>=0.1.9",
+    "uvicorn>=0.41.0",
+    "wavy-totem-lib>=2.1.2",
+]

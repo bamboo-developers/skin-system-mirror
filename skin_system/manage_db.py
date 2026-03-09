@@ -2,7 +2,7 @@ import sqlite3
 from typing import Literal
 import skin_system
 from .get_path import *
-from flask import jsonify
+from fastapi.responses import JSONResponse
 import os
 import requests
 
@@ -113,7 +113,7 @@ class ManageDB():
                 cursor.execute('''SELECT * FROM user_data WHERE nickname = ? OR redirect_from_ely = ?;''',
                                (redirect_nickname, redirect_nickname))
             else:
-                return jsonify({"message": "nickname and redirected nickname are empty", "code": 400}), 400
+                return JSONResponse({"message": "nickname and redirected nickname are empty", "code": 400}, status_code=400)
 
             return cursor.fetchone()
 
@@ -243,16 +243,13 @@ class ManageDB():
             return {"message": f"Can't load skin data, {response.status_code}: {response.text}", "code": 500}
 
     def return_texture_data_for_system(self, **kwargs):
-        skin_data =None
-
+        skin_data = None
         if 'nickname' not in kwargs and 'user_id' not in kwargs:
             raise ValueError("You must provide either 'nickname' or 'user_id'")
-
         if 'proxy' not in kwargs:
             proxy = False
         else:
             proxy = kwargs['proxy']
-
         if 'nickname' in kwargs and 'user_id' in kwargs:
             raise ValueError("You can provide either 'nickname' or 'user_id', not both")
 
@@ -263,35 +260,38 @@ class ManageDB():
 
         with connect_to_db() as connection:
             cursor = connection.cursor()
+            cursor.execute(f'''SELECT id, nickname, skin_id FROM user_data WHERE {value} = ?''', (kwargs[value],))
+            rows = cursor.fetchall()
 
-            user_data = f'''SELECT id, nickname, skin_id FROM user_data WHERE {value} = ?'''
-            cursor.execute(user_data, (kwargs[value],))
-            user_data = cursor.fetchall()[0]
+            if not rows:
+                if proxy:
+                    return self.proxy_from_ely(url=f'http://skinsystem.ely.by/textures/signed/{kwargs[value]}?proxy=true')
+                return {"message": "user not found", "code": 404}
 
-            if  user_data[2]:
-                skin_data = '''SELECT value, signature FROM skin_data WHERE id = ?'''
-                cursor.execute(skin_data, (user_data[2],))
-                skin_data = cursor.fetchall()[0]
+            user_data = rows[0]
+
+            if user_data[2]:
+                cursor.execute('''SELECT value, signature FROM skin_data WHERE id = ?''', (user_data[2],))
+                skin_rows = cursor.fetchall()
+                skin_data = skin_rows[0] if skin_rows else ["None record on database", ""]
             else:
                 if proxy:
                     return self.proxy_from_ely(url=f'http://skinsystem.ely.by/textures/signed/{user_data[1]}?proxy=true')
-                else:
-                    skin_data = ["None record on database", ""]
+                skin_data = ["None record on database", ""]
 
-            data = {
-                "id": user_data[0],
-                "name": user_data[1],
-                "properties": [
-                    {
-                        "name": "textures",
-                        "signature": skin_data[1],
-                        "value": skin_data[0]
-                    },
-                    {
-                        "name": str(os.environ.get("SKIN_SYSTEM_NAME")),
-                        "value": "I know why you are asking)"
-                    }
-                ]
-            }
-
-        return data
+        return {
+            "id": user_data[0],
+            "name": user_data[1],
+            "properties": [
+                {
+                    "name": "textures",
+                    "signature": skin_data[1],
+                    "value": skin_data[0]
+                },
+                {
+                    "name": str(os.environ.get("SKIN_SYSTEM_NAME")),
+                    "value": "I know why you are asking)"
+                }
+            ]
+        }
+    

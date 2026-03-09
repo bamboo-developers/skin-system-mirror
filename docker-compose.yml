@@ -7,13 +7,11 @@ services:
     volumes:
       - .:/skin-system
       - ./logs/nginx:/var/log/nginx
-      - ./logs/gunicorn:/app/logs
     ports:
       - "5050:5050"
-      - "5000:5000"
     environment:
       - PYTHONUNBUFFERED=1
       - SKIN_SYSTEM_NAME=skin-system
       - SIGN_API_TOKEN=TO_CREATE_TOKEN_->_https://mineskin.org/apikey
       - TOKEN_SYSTEM=1
-    restart: always
+    restart: unless-stopped

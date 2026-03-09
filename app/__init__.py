@@ -1,36 +1,39 @@
-from flask import Flask
-from werkzeug.exceptions import HTTPException
+from fastapi import FastAPI
+from fastapi.exceptions import HTTPException
 import skin_system
 from skin_system.manage_db import create_db
 from .extensions import limiter
-from .routers import (skin, render, perspective_render, errors, textures, profile, signature_ver_key, signed_textures,
+from .routers import (skin, render, render_totem, perspective_render, errors, textures, profile, signature_ver_key, signed_textures,
                       ely_set_nickname, remove_skin_db, search_on_db, debug, temp_save_skins, sign_skin, toggle_redirect, remove_user_db)
 
+def create_app() -> FastAPI:
+    app = FastAPI()
 
-def create_app():
-    app = Flask(__name__)
+    app.state.limiter = limiter
+    app.add_exception_handler(Exception, errors.handle_error)
+    app.add_exception_handler(HTTPException, errors.handle_error)
 
-    limiter.init_app(app)
+    app.include_router(debug.router)
+    app.include_router(skin.router)
+    app.include_router(render.router)
+    app.include_router(render_totem.router)
+    app.include_router(perspective_render.router)
+    app.include_router(textures.router)
+    app.include_router(profile.router)
+    app.include_router(signature_ver_key.router)
+    app.include_router(signature_ver_key.router2)
+    app.include_router(signed_textures.router)
+    app.include_router(ely_set_nickname.router)
+    app.include_router(remove_skin_db.router)
+    app.include_router(search_on_db.router)
+    app.include_router(temp_save_skins.router)
+    app.include_router(sign_skin.router)
+    app.include_router(toggle_redirect.router)
+    app.include_router(remove_user_db.router)
 
-    app.register_error_handler(HTTPException, errors.handle_error)
-
-    app.register_blueprint(debug.bp)
-    app.register_blueprint(skin.bp)
-    app.register_blueprint(render.bp)
-    app.register_blueprint(perspective_render.bp)
-    app.register_blueprint(textures.bp)
-    app.register_blueprint(profile.bp)
-    app.register_blueprint(signature_ver_key.bp), app.register_blueprint(signature_ver_key.bp2)
-    app.register_blueprint(signed_textures.bp)
-    app.register_blueprint(ely_set_nickname.bp)
-    app.register_blueprint(remove_skin_db.bp)
-    app.register_blueprint(search_on_db.bp)
-    app.register_blueprint(temp_save_skins.bp)
-    app.register_blueprint(sign_skin.bp)
-    app.register_blueprint(toggle_redirect.bp)
-    app.register_blueprint(remove_user_db.bp)
-
-    create_db()
-    skin_system.load_tokens()
+    @app.on_event("startup")
+    async def startup_event():
+        create_db()
+        skin_system.load_tokens()
 
     return app

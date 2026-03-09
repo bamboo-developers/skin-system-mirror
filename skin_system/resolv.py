@@ -1,11 +1,8 @@
 import requests
-from flask import Response
-
+from fastapi.responses import Response
 
 def resolve(url):
     response = requests.get(url)
-
     if response.status_code != 200:
-        return {}, 404
-
-    return Response(response.content, content_type=response.headers['Content-Type'])
+        return Response(content=b'', status_code=404)
+    return Response(content=response.content, media_type=response.headers['Content-Type'])

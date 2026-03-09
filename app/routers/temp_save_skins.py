@@ -1,5 +1,7 @@
-from flask import Blueprint, request, send_from_directory, jsonify
+from fastapi import APIRouter, Request, UploadFile, File, Form
+from fastapi.responses import JSONResponse, FileResponse
 import skin_system
+import os
 
 '''
 curl -X POST http://127.0.0.1:5000/temp \
@@ -8,25 +10,28 @@ curl -X POST http://127.0.0.1:5000/temp \
   -F 'time=60'
 '''
 
-bp = Blueprint('temp_save_skins', __name__)
+router = APIRouter()
 
 UPLOAD_FOLDER = skin_system.get_path('temp/', "..")
 
-
-@bp.route('/temp', methods=['POST'])
+@router.post('/temp')
 @skin_system.token_required(1, method='POST')
-def upload_skin():
-    file = request.files.get('file')
-    time = min(int(request.form.get('time', 120)), 300)
+async def upload_skin(
+    request: Request,
+    file: UploadFile = File(None),
+    time: int = Form(120)
+):
+    time = min(time, 300)
+
     if not file:
-        return jsonify({'message': 'No file provided', 'code': 400}), 400
+        return JSONResponse({'message': 'No file provided', 'code': 400}, status_code=400)
+
     result = skin_system.temp_skin_storge(file, web=True, time=time)
     if isinstance(result, tuple):
         return result
-
     return result
 
-
-@bp.route('/temp/get/<filename>', methods=['GET'])
-def download_skin(filename):
-    return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
+@router.get('/temp/get/{filename}')
+def download_skin(filename: str):
+    file_path = os.path.join(UPLOAD_FOLDER, filename)
+    return FileResponse(path=file_path, filename=filename, media_type='application/octet-stream')

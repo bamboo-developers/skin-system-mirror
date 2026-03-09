@@ -5,19 +5,18 @@ import skin_system
 
 router = APIRouter()
 
-@router.get('/render/{username}')
+@router.get('/render/totem/{username}')
 @skin_system.token_required(0)
-def func(username: str, request: Request, scale: int = 8, type: str = 'body', layer: int = 1):
+def func(username: str, request: Request, round_head: bool = True):
     try:
         username = skin_system.DB.what_redirect_of(username, 'ely')
         url = f"http://skinsystem.ely.by/skins/{username['ely']}.png"
         skin_image = skin_system.resolv_skin(url)
 
-        scale = min(scale, 100)
-        processed_skin = skin_system.process(skin_image, scale, type, layer)
+        processed_totem = skin_system.process_totem(skin_image, round_head)
 
         img_io = BytesIO()
-        processed_skin.save(img_io, 'PNG')
+        processed_totem.save(img_io, 'PNG')
         img_io.seek(0)
 
         return Response(content=img_io.read(), media_type='image/png')

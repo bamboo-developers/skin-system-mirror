@@ -1,4 +1,5 @@
-from flask import Blueprint, request, jsonify
+from fastapi import APIRouter, Request, UploadFile, File, Form
+from fastapi.responses import JSONResponse
 import skin_system
 import os
 
@@ -10,25 +11,28 @@ curl -X POST http://127.0.0.1:5000/sys/add/user \
   -F 'token=token'
 '''
 
-bp = Blueprint('sign_skin', __name__)
+router = APIRouter()
 
-
-@bp.route('/sys/add/user', methods=['POST'])
+@router.post('/sys/add/user')
 @skin_system.token_required(1, method='POST')
-def upload_skin():
-    file = request.files.get('file')
-    nickname = request.form.get('nickname')
-    redirect_ely: int = min(request.form.get('redirect', default=0, type=int), 1)
+async def upload_skin(
+    request: Request,
+    file: UploadFile = File(None),
+    nickname: str = Form(None),
+    redirect: int = Form(0)
+):
+    redirect_ely = min(redirect, 1)
 
     if not file:
-        return jsonify({'message': 'No file provided', 'code': 400}), 400
+        return JSONResponse({'message': 'No file provided', 'code': 400}, status_code=400)
     if not nickname:
-        return jsonify({'message': 'No nickname provided', 'code': 400}), 400
+        return JSONResponse({'message': 'No nickname provided', 'code': 400}, status_code=400)
     if not skin_system.valid_minecraft_nick(nickname):
-        return jsonify({'message': f'invalid nickname: {nickname}', 'code': 422}), 422
+        return JSONResponse({'message': f'invalid nickname: {nickname}', 'code': 422}, status_code=422)
 
     file_path = os.path.join('/tmp', file.filename)
-    file.save(file_path)
+    with open(file_path, 'wb') as f:
+        f.write(await file.read())
 
     try:
         skin_id = skin_system.DB.get_sign_skin(nickname, file_path)
@@ -36,13 +40,11 @@ def upload_skin():
         result = skin_system.DB.set_skin_id(nickname, skin_id)
 
         if not result:
-            return jsonify({'message': 'something went wrong', 'code': 500, 'error': result}), 500
-
+            return JSONResponse({'message': 'something went wrong', 'code': 500, 'error': result}, status_code=500)
         if isinstance(result, tuple):
             return result
-
-        return jsonify({'message': 'success', 'code': 200}), 200
-
+        return JSONResponse({'message': 'success', 'code': 200}, status_code=200)
     finally:
         if os.path.exists(file_path):
             os.remove(file_path)
+            
